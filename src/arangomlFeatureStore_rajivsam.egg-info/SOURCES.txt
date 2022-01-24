@@ -1,0 +1,13 @@
+LICENSE.txt
+README.md
+pyproject.toml
+setup.py
+src/arangomlFeatureStore/__init__.py
+src/arangomlFeatureStore/feature_store.py
+src/arangomlFeatureStore/feature_store_admin.py
+src/arangomlFeatureStore/managed_service_conn_parameters.py
+src/arangomlFeatureStore/oasis.py
+src/arangomlFeatureStore_rajivsam.egg-info/PKG-INFO
+src/arangomlFeatureStore_rajivsam.egg-info/SOURCES.txt
+src/arangomlFeatureStore_rajivsam.egg-info/dependency_links.txt
+src/arangomlFeatureStore_rajivsam.egg-info/top_level.txt

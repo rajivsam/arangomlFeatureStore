@@ -1,0 +1,7 @@
+---
+arangodb:
+  edge_col: entity-feature-value
+  entity_col: entity
+  feature_value_col: feature-value
+  graph_name: feature_store_graph
+  replication_factor: 3
