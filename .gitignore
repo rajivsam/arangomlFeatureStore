@@ -1,11 +1,11 @@
 # Compiled python modules.
-**/*.pyc
+*.pyc
 # log files
-**/*.log
+*.log
 # Setuptools distribution folder.
-dist/
+dist
 # Remove the build directory from repo
-build/
+build
 # Remove the data dir for the pytorch examples from repo
 *.egg-info
 #ipynb checkpoints
