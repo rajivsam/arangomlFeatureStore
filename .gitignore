@@ -1,0 +1,16 @@
+# Compiled python modules.
+**/*.pyc
+# log files
+**/*.log
+# Setuptools distribution folder.
+dist/
+# Remove the build directory from repo
+build/
+# Remove the data dir for the pytorch examples from repo
+*.egg-info
+#ipynb checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+#OSX DS_Store
+**/*.DS_Store
+.venv
