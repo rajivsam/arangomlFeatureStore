@@ -1,0 +1,2 @@
+include src/arangomlFeatureStore/config/arango_feature_store_config.yaml
+include src/arangomlFeatureStore/creds.dat

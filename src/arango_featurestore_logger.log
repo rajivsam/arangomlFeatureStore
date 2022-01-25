@@ -718,3 +718,15 @@
 2022-01-24 14:09:17,758 - arango_featurestore_logger - INFO - AQL:FOR doc IN `entity-feature-value`  FILTER doc.`tag` == "modelABC" FOR fv in `feature-value` FILTER fv._id == doc._to RETURN fv 
 2022-01-24 14:09:17,970 - arango_featurestore_logger - INFO - 2 records returned with feature set tag specified.
 2022-01-24 14:09:17,970 - arango_featurestore_logger - INFO - Results: [{'_key': 'test_value2616937c-2f84-4205-9c3e-7c82d7de03a1', '_id': 'feature-value/test_value2616937c-2f84-4205-9c3e-7c82d7de03a1', '_rev': '_dmq7LrC---', 'attribute': [0.1234, 0.1234, 0.1234], 'tag': 'featureset-test'}, {'_key': 'test_value5a106c94-8f4f-4475-b972-9d7779468ecb', '_id': 'feature-value/test_value5a106c94-8f4f-4475-b972-9d7779468ecb', '_rev': '_dmq7Nvi--A', 'attribute': [0.1234, 0.1234, 0.1234], 'tag': 'featureset-test'}]
+2022-01-25 07:39:54,271 - arango_featurestore_logger - INFO - Connection information: {'dbName': 'TUT8ygvi9uliy6dz7m1luk4bk', 'username': 'TUTacnaxbuupyml2ek4pbs3s', 'password': 'TUT5yzj8tintdsmo688w9zc7b', 'hostname': 'tutorials.arangodb.cloud', 'port': 8529}
+2022-01-25 07:39:55,734 - arango_featurestore_logger - INFO - feature_store_graph is not provisioned in the database, creating it! 
+2022-01-25 07:39:56,857 - arango_featurestore_logger - INFO - entity is not a provisioned collection, creating it! 
+2022-01-25 07:39:57,670 - arango_featurestore_logger - INFO - feature-value is not a provisioned collection, creating it! 
+2022-01-25 07:39:59,010 - arango_featurestore_logger - INFO - entity-feature-value is not provisioned in the database, creating it! 
+2022-01-25 07:39:59,829 - arango_featurestore_logger - INFO - entity-feature-value edge definition is not provisioned in the database, creating it! 
+2022-01-25 07:42:04,567 - arango_featurestore_logger - INFO - Connection information: {'dbName': 'TUTzr7s66lu2dmrdqxk4okxaj', 'username': 'TUTtnn5sgm5wpc0bv7aizer', 'password': 'TUTxncwrbu18yb1ytk9jfdfo4', 'hostname': 'tutorials.arangodb.cloud', 'port': 8529}
+2022-01-25 07:42:05,778 - arango_featurestore_logger - INFO - feature_store_graph is not provisioned in the database, creating it! 
+2022-01-25 07:42:07,279 - arango_featurestore_logger - INFO - entity is not a provisioned collection, creating it! 
+2022-01-25 07:42:07,928 - arango_featurestore_logger - INFO - feature-value is not a provisioned collection, creating it! 
+2022-01-25 07:42:08,724 - arango_featurestore_logger - INFO - entity-feature-value is not provisioned in the database, creating it! 
+2022-01-25 07:42:09,873 - arango_featurestore_logger - INFO - entity-feature-value edge definition is not provisioned in the database, creating it! 

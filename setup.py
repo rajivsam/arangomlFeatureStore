@@ -4,8 +4,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="arangomlFeatureStore-rajivsam",
-    version="0.0.1",
+    name="arangomlFeatureStore",
+    version="0.0.7.2",
     author="Rajiv Sambasivan",
     author_email="rajiv@arangodb.com",
     description="A python package to read and write ML features to ArangoDB",
@@ -20,7 +20,9 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    package_dir={"arangomlFeatureStore": "src/arangomlFeatureStore"},
+    packages=setuptools.find_packages(where="src", include=['arangomlFeatureStore']),
+    package_data={'config': ['config/arango_feature_store_config.yaml']},
+    include_package_data=True,
     python_requires=">=3.6",
 )

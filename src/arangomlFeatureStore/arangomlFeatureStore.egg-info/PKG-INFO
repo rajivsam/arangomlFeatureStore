@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
-Name: arangomlFeatureStore-rajivsam
-Version: 0.0.2
+Name: arangomlFeatureStore
+Version: 0.0.5.8
 Summary: A python package to read and write ML features to ArangoDB
 Home-page: https://github.com/rajivsam/arangomlFeatureStore
 Author: Rajiv Sambasivan

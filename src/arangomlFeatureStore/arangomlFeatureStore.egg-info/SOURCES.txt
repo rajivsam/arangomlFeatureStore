@@ -1,0 +1,8 @@
+LICENSE.txt
+README.md
+pyproject.toml
+setup.py
+src/arangomlFeatureStore/arangomlFeatureStore.egg-info/PKG-INFO
+src/arangomlFeatureStore/arangomlFeatureStore.egg-info/SOURCES.txt
+src/arangomlFeatureStore/arangomlFeatureStore.egg-info/dependency_links.txt
+src/arangomlFeatureStore/arangomlFeatureStore.egg-info/top_level.txt
