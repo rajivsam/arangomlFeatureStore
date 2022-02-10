@@ -72,6 +72,8 @@ def connect(login):
 def connect_python_arango(login):
     url = "https://"+login["hostname"]+":"+str(login["port"])
     database = None
+    print("URL:" + str(url))
+    print("DB :" + str(login['dbName']))
     # Initialize the ArangoDB client.
     client = ArangoClient(hosts=url)
     try:

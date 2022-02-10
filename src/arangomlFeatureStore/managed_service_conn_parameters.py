@@ -55,3 +55,17 @@ class ManagedServiceConnParam:
     @property
     def DB_NOTIFICATION_EMAIL(self):
         return "email"
+    @property
+    def OASIS_HOST(self):
+        return "hostname"
+    @property
+    def OASIS_PORT(self):
+        return "port"
+    @property
+    def OASIS_CONN_PROTOCOL(self):
+        return "protocol"
+    @property
+    def OASIS_FS_GRAPH(self):
+        return "graph_name"
+
+
