@@ -2,85 +2,42 @@ import json
 import requests
 import sys
 import time
-import os
-
-from pyArango.connection import *
+import logging
+logger = logging.getLogger('arango_featurestore_logger')
+from pyArango.connection import Connection
 from arango import ArangoClient
 
+
 # retrieving credentials from ArangoDB tutorial service
-def getTempCredentials(tutorialName=None,credentialProvider="https://tutorials.arangodb.cloud:8529/_db/_system/tutorialDB/tutorialDB"):
+def getTempCredentials(
+    tutorialName=None,
+    credentialProvider="https://tutorials.arangodb.cloud:8529/_db/_system/tutorialDB/tutorialDB",
+):
+    body = {"tutorialName": tutorialName} if tutorialName else "{}"
+    x = requests.post(credentialProvider, data=json.dumps(body))
+    if x.status_code != 200:
+        print("Error retrieving login data.")
+        sys.exit()
+    time.sleep(5)
+    logger.info("New credentials obtained from Oasis.")
+    return json.loads(x.text)
 
-    fname = os.path.join(os.path.dirname(__file__), "creds.dat")
-    with open(fname, "r+") as cacheFile:
-        contents = cacheFile.readline()
-        if len(contents) > 0:
-            login = None
-            url = ""
-           
-            # check if credentials are still valid
-            try:
-                login = json.loads(contents)
-                url = "https://"+login["hostname"]+":"+str(login["port"])
-            except:
-                # Incorrect data in cred file and retrieve new credentials
-                cacheFile.truncate(0) 
-                pass
-        
-            conn =""
-            if (login is not None):
-                try: 
-                    conn = Connection(arangoURL=url, username=login["username"], password=login["password"],)
-                    print("Reusing cached credentials.")
-                    return login
-                except:
-                    print("Credentials expired.")
-                    pass # Ignore and retrieve new 
-    
-        # Retrieve new credentials from Foxx Service
-        print("Requesting new temp credentials.")
-        if (tutorialName is not None):
-             body = {
-            "tutorialName": tutorialName
-             }
-        else:
-            body = "{}"
-        
-        url = credentialProvider
-        x = requests.post(url, data = json.dumps(body))
-
-        if x.status_code != 200:
-            print("Error retrieving login data.")
-            sys.exit()
-        # Caching credentials
-        cacheFile.truncate(0) 
-        cacheFile.write(x.text)
-        print("Temp database ready to use.")
-        return json.loads(x.text)
 
 # Connect against an oasis DB and return pyarango connection
-def connect(login):
-    url = "https://"+login["hostname"]+":"+str(login["port"])
-    conn = None
-    try:
-        conn = Connection(arangoURL=url, username=login["username"], password=login["password"],)
-    except:
-        time.sleep(1)
-        conn = Connection(arangoURL=url, username=login["username"], password=login["password"],)
-    return conn
-        
-# Connect against an oasis DB and return pyarango connection
-def connect_python_arango(login):
-    url = "https://"+login["hostname"]+":"+str(login["port"])
-    database = None
-    print("URL:" + str(url))
-    print("DB :" + str(login['dbName']))
-    # Initialize the ArangoDB client.
-    client = ArangoClient(hosts=url)
-    try:
-        database = client.db(login["dbName"], username=login["username"], password=login["password"])
-    except:
-        time.sleep(1)
-        database = client.db(login["dbName"], username=login["username"], password=login["password"])
-    return database   
-    
-    
+def connect(login: dict):
+    url = "https://" + login["hostname"] + ":" + str(login["port"])
+    return Connection(
+        arangoURL=url, username=login["username"], password=login["password"]
+    )
+
+
+# Connect against an oasis DB and return python-arango connection
+def connect_python_arango(login: dict):
+    url = "https://" + login["hostname"] + ":" + str(login["port"])
+    logger.info("Python-arango Connection made to: " + str(url))
+    return ArangoClient(hosts=url).db(
+        login["dbName"],
+        username=login["username"],
+        password=login["password"],
+        verify=True,
+    )

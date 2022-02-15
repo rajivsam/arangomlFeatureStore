@@ -1,5 +1,6 @@
 
 import logging
+import traceback
 from . import oasis
 import os
 import yaml
@@ -31,17 +32,13 @@ class FeatureStoreAdmin():
     def __init__(self, conn_config=None):
         if conn_config is not None:
             logger.info("Connection information specified: " + str(conn_config))
+            self.db = self.connect_to_db(conn_config, num_tries=2)
             self.db_name = conn_config[mscp.DB_NAME]
             self.username  = conn_config[mscp.DB_USER_NAME]
             self.hostname = conn_config[mscp.OASIS_HOST]
             self.protocol = conn_config[mscp.OASIS_CONN_PROTOCOL]
             self.password = conn_config[mscp.DB_PASSWORD]
             self.port = conn_config[mscp.OASIS_PORT]
-            self.db = self.connect_to_db()
-            heart_beat_check = self.heartbeat(conn_config[mscp.OASIS_FS_GRAPH])
-            if not heart_beat_check:
-                logger.info("The connection information you specified is not valid, check and try again.")
-                return
             self.feature_graph = self.db.graph(conn_config[mscp.OASIS_FS_GRAPH])
             self.cfg = self.write_connection_info()
 
@@ -56,11 +53,18 @@ class FeatureStoreAdmin():
                 self.password = self.cfg['arangodb'][mscp.DB_PASSWORD]
                 self.db_name = self.cfg['arangodb'][mscp.DB_NAME]
                 logger.info("Using connection information in config file: " + str(self.cfg))
-                self.db = self.connect_to_db()
+                self.db = self.connect_to_db(self.cfg['arangodb'], num_tries = 2)
                 heart_beat_check = self.heartbeat(self.cfg['arangodb'][mscp.OASIS_FS_GRAPH])
                 if not heart_beat_check:
                     logger.info("The connection information is stale, getting a new connection.")
-                    self.db = self.get_new_oasis_db()
+                    con = oasis.getTempCredentials()
+                    self.hostname = con[mscp.OASIS_HOST]
+                    self.protocol = "https"
+                    self.port = con[mscp.OASIS_PORT]
+                    self.username = con[mscp.DB_USER_NAME]
+                    self.password = con[mscp.DB_PASSWORD]
+                    self.db_name = con[mscp.DB_NAME]
+                    self.db = self.connect_to_db(con)
                     logger.info("Provisioning Graph...")
                     self.feature_graph = self.create_feature_store_db()
                     self.cfg = self.write_connection_info()
@@ -73,7 +77,7 @@ class FeatureStoreAdmin():
                 self.username = con[mscp.DB_USER_NAME]
                 self.password = con[mscp.DB_PASSWORD]
                 self.db_name = con[mscp.DB_NAME]
-                self.db = self.get_new_oasis_db()
+                self.db = self.connect_to_db(con)
                 logger.info("Connected to DB, writing connection information to disk for next session!")
                 logger.info("Provisioning Graph...")
                 self.feature_graph = self.create_feature_store_db()
@@ -83,18 +87,29 @@ class FeatureStoreAdmin():
 
         return
 
-    def connect_to_db(self):
-        url = self.protocol + "://" + self.hostname + ":" + str(self.port)
-        client = ArangoClient(hosts=url)
-        db = client.db(self.db_name, username=self.username, password=self.password)
+    def connect_to_db(self, conn_info, num_tries = 1):
+
+        db = None
+        for i in range(num_tries):
+            logger.info("Attempting to connect to db, attempt # " + str(i+1))
+            try:
+                db = oasis.connect_python_arango(conn_info)
+                break
+            except Exception as e:
+                logger.error("Error connecting to DB")
+                logger.error("Following exception received: " + str(e))
+
         return db
 
     def heartbeat(self, graph_name):
+        heart_beat_check = False
         try:
             heart_beat_check = self.db.has_graph(graph_name)
+
         except :
-            heart_beat_check = False
-            logger.info("Heart beat check failed, get a new db")
+            logger.info("Heart beat check failed!")
+
+
         return heart_beat_check
 
 
@@ -176,25 +191,3 @@ class FeatureStoreAdmin():
 
 
         return feature_store_graph
-
-
-    def get_new_oasis_db(self):
-        url = self.protocol + "://" + self.hostname + ":" + str(self.port)
-        client = ArangoClient(hosts=url)
-        try:
-            con = oasis.getTempCredentials()
-            db = client.db(con[mscp.DB_NAME], username=con[mscp.DB_USER_NAME], password=con[mscp.DB_PASSWORD])
-            logger.info("Got new Oasis Connection, connection information: " + str(con))
-            self.hostname = con[mscp.OASIS_HOST]
-            self.port = con[mscp.OASIS_PORT]
-            self.db_name = con[mscp.DB_NAME]
-            self.password = con[mscp.DB_PASSWORD]
-        except :
-            logger.info("Could not use the old connection information, requesting a new Oasis Connection...")
-            time.sleep(1)
-
-        #logging.info("Oasis DB is " + str(db))
-        return db
-
-
-
