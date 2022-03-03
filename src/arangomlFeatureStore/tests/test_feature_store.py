@@ -56,6 +56,27 @@ def test_link_entity_feature_value(conn_params):
     assert metadata['_id'] == edge_id
 
 
+def test_bulk_feature_inserts(conn_params):
+    fa = conn_params['feature_store_admin']
+    fs = fa.get_feature_store()
+    cfg = conn_params['config']
+    NUM_INSERTS = 1000
+    entity_list = list()
+    value_list = list()
+    entity_value_list = list()
+    for i in range(NUM_INSERTS):
+        test_value = {'_key': 'test_value' + str(uuid.uuid4()), 'attribute': [0.1234, 0.1234, 0.1234], 'tag': 'featureset-bulk'}
+        value_list.append(test_value)
+        test_entity = {'_key': 'test_entity' + str(uuid.uuid4()), 'attribute': 'some value'}
+        entity_list.append(test_entity)
+        edoc = {'_from': test_entity['_key'], '_to': test_value['_key'], 'tag': 'featureset-bulk'}
+        entity_value_list.append(edoc)
+    fs.add_entity_bulk(entity_list)
+    fs.add_value_bulk(value_list)
+    fs.link_entity_feature_value_bulk(entity_value_list)
+    logger.info("Completed bulk inserts")
+
+
 
 def test_find_entity(conn_params):
     fa = conn_params['feature_store_admin']

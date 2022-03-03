@@ -1,16 +1,38 @@
 import logging
+
 logger = logging.getLogger('arango_featurestore_logger')
+
+
 class FeatureStore:
 
     def __init__(self, db, cfg):
         self.db = db
         self.cfg = cfg
         return
+
     def add_entity(self, doc):
         ENTITY_COLL = self.cfg['arangodb']['entity_col']
         entity_col = self.db.collection(ENTITY_COLL)
         metadata = entity_col.insert(doc)
         return metadata
+
+    def add_entity_bulk(self, doc_list, batch_size=500, poverwrite=False):
+        import json
+
+        batch = []
+        batch_idx = 1
+        collection = self.db.collection(self.cfg['arangodb']['entity_col'])
+        for index, doc in enumerate(doc_list):
+            batch.append(doc)
+            last_record = (index == (len(doc_list) - 1))
+            if (index + 1) % batch_size == 0:
+                logger.info("Batch insert of entities, inserting batch %d" % (batch_idx))
+                batch_idx += 1
+                collection.import_bulk(batch,  on_duplicate="update", overwrite=poverwrite)
+                batch = []
+            if last_record and (len(batch) > 0):
+                logger.info("Batch insert of entities, inserting batch the last batch!")
+                collection.import_bulk(batch, on_duplicate="update", overwrite=poverwrite)
 
     def add_value(self, doc):
         FEATURE_VAL_COLL = self.cfg['arangodb']['feature_value_col']
@@ -18,11 +40,56 @@ class FeatureStore:
         metadata = feature_val_col.insert(doc)
         return metadata
 
+    def add_value_bulk(self, doc_list, batch_size=500, poverwrite=False):
+        import json
+        batch = []
+        batch_idx = 1
+        collection = self.db.collection(self.cfg['arangodb']['feature_value_col'])
+        for index, doc in enumerate(doc_list):
+            batch.append(doc)
+            last_record = (index == (len(doc_list) - 1))
+            if (index + 1) % batch_size == 0:
+                logger.info("Batch insert of values, inserting batch %d" % (batch_idx))
+                batch_idx += 1
+                collection.import_bulk(batch,  on_duplicate="update", overwrite=poverwrite)
+                batch = []
+            if last_record and (len(batch) > 0):
+                #logger.info(f"Batch size: {len(batch)}")
+                logger.info("Batch insert of values, inserting batch the last batch!")
+                collection.import_bulk(batch, on_duplicate="update", overwrite=poverwrite)
+
+
+    def link_entity_feature_value_bulk(self, doc_list, batch_size=500, poverwrite=False):
+        import json
+        FEATURE_VAL_COLL = self.cfg['arangodb']['feature_value_col']
+        ENTITY_COLL = self.cfg['arangodb']['entity_col']
+        batch = []
+        batch_idx = 1
+        collection = self.db.collection(self.cfg['arangodb']['edge_col'])
+        for index, doc in enumerate(doc_list):
+            from_id = ENTITY_COLL + '/' + doc['_from']
+            to_id = FEATURE_VAL_COLL + '/' + doc['_to']
+            edge_key = doc['_from'] + '-' + doc['_to']
+            doc['_key'] = edge_key
+            doc['_from'] = from_id
+            doc['_to'] = to_id
+            # insert_doc2 = {"_from": e[1], "_to": e[0]}
+            batch.append(doc)
+            last_record = (index == (len(doc_list) - 1))
+            if (index + 1) % batch_size == 0:
+                logger.info("Batch insert of links, inserting batch %d" % (batch_idx))
+                batch_idx += 1
+                collection.import_bulk(batch,  on_duplicate="update", overwrite=poverwrite)
+                batch = []
+            if last_record and (len(batch) > 0):
+                logger.info("Batch insert of links, inserting batch the last batch!")
+                collection.import_bulk(batch, on_duplicate="update", overwrite=poverwrite)
+
     def link_entity_feature_value(self, doc):
         FEATURE_VAL_COLL = self.cfg['arangodb']['feature_value_col']
         ENTITY_COLL = self.cfg['arangodb']['entity_col']
         from_id = ENTITY_COLL + '/' + doc['_from']
-        to_id  = FEATURE_VAL_COLL + '/' + doc['_to']
+        to_id = FEATURE_VAL_COLL + '/' + doc['_to']
         edge_key = doc['_from'] + '-' + doc['_to']
         doc['_key'] = edge_key
         doc['_from'] = from_id
@@ -31,7 +98,6 @@ class FeatureStore:
         ec = self.db.collection(self.cfg['arangodb']['edge_col'])
         metadata = ec.insert(doc, overwrite=True)
         return metadata
-
 
     def find_entity(self, attrib_name, attrib_value):
         "Return the feature values that match the criteria provided in filter"
@@ -65,7 +131,6 @@ class FeatureStore:
 
         return
 
-
     def get_featureset_with_tag(self, tag_name, tag_value):
         EDGE_COLL = self.cfg['arangodb']['edge_col']
         FEATURE_VAL_COLL = self.cfg['arangodb']['feature_value_col']
@@ -91,4 +156,3 @@ class FeatureStore:
     def bulk_update(self, idlist, new_feature_value_list):
         "Update each id in the idlist with the corresponding entry in the new_feature_values list"
         return
-

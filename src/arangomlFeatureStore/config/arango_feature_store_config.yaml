@@ -1,12 +1,12 @@
 arangodb:
-  dbName: TUTmr7kftpkwko8oway6g7c9i
+  dbName: TUThyeakkvs3t80rlwqg9tnipi
   edge_col: entity-feature-value
   entity_col: entity
   feature_value_col: feature-value
   graph_name: feature_store_graph
   hostname: tutorials.arangodb.cloud
-  password: TUT0e4pvhukrjgnzuw77nhvwui
+  password: TUTiupac2s53i2kmnfuo5foq
   port: 8529
   protocol: https
   replication_factor: 3
-  username: TUTivcxgivu8fam0pfyas6zce
+  username: TUTfprz11d3r4omnmbrvidia

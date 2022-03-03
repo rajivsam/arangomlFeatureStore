@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="arangomlFeatureStore",
-    version="0.0.7.5",
+    version="0.0.7.8",
     author="Rajiv Sambasivan",
     author_email="rajiv@arangodb.com",
     description="A python package to read and write ML features to ArangoDB",
